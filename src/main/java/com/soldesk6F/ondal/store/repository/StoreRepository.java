@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface StoreRepository extends JpaRepository<Store, UUID> {
+public interface StoreRepository extends JpaRepository<Store, UUID>, StoreRepositoryCustom  {
 	List<Store> findByCategory(String category);
 	List<Store> findByOwner(Owner owner);
 	List<Store> findByStoreStatus(StoreStatus status);
@@ -49,145 +49,148 @@ public interface StoreRepository extends JpaRepository<Store, UUID> {
 	@Query("SELECT s FROM Store s LEFT JOIN FETCH s.storeImgs WHERE s.storeId = :storeId")
 	Optional<Store> findWithStoreImgsByStoreId(@Param("storeId") UUID storeId);
 	List<Store> findByOwnerOwnerId(UUID ownerId);
+	
+	@Query(value = "SELECT store_name FROM store", nativeQuery = true)
+	List<String> findAllStoreNames();
 
-	@Query(
-		    value = """
-		        SELECT  s.*,
-		                ST_Distance_Sphere(
-		                    s.store_location,
-		                    ST_SRID(Point(:lon, :lat), 4326)
-		                ) AS dist
-		        FROM    store s
-		        WHERE   MBRContains(
-		    			ST_GeomFromText('POLYGON((126.971639 37.508727, 127.039609 37.508727, 127.039609 37.562625, 126.971639 37.562625, 126.971639 37.508727))', 4326, 'axis-order=long-lat')
-		                 ,   s.store_location
-		                )
-		          AND   ST_Distance_Sphere(
-		                    s.store_location,
-		                    ST_SRID(Point(:lon, :lat), 4326)
-		                ) <= :radius
-		          AND  (
-		                    s.store_name LIKE CONCAT('%', :original, '%')
-		                    OR s.store_name LIKE CONCAT('%', :bestMatcher, '%')
-		                    OR EXISTS (
-		                           SELECT 1
-		                           FROM   menu m
-		                           WHERE  m.store_id = s.store_id
-		                             AND (
-		                                  m.menu_name LIKE CONCAT('%', :original, '%')
-		                                  OR m.menu_name LIKE CONCAT('%', :bestMatcher, '%')
-		                                 )
-		                       )
-		               )
-		        ORDER BY dist ASC
-		        """,
-		    countQuery = """
-		        SELECT COUNT(*)
-		        FROM   store s
-		        WHERE  MBRContains(
-		    				ST_GeomFromText('POLYGON((126.971639 37.508727, 127.039609 37.508727, 127.039609 37.562625, 126.971639 37.562625, 126.971639 37.508727))', 4326, 'axis-order=long-lat')
-		                   ,s.store_location
-		               )
-		          AND  ST_Distance_Sphere(
-		                   s.store_location,
-		                   ST_SRID(Point(:lon, :lat), 4326)
-		               ) <= :radius
-		          AND  (
-		                   s.store_name LIKE CONCAT('%', :original, '%')
-		                   OR s.store_name LIKE CONCAT('%', :bestMatcher, '%')
-		                   OR EXISTS (
-		                          SELECT 1
-		                          FROM   menu m
-		                          WHERE  m.store_id = s.store_id
-		                            AND (
-		                                 m.menu_name LIKE CONCAT('%', :original, '%')
-		                                 OR m.menu_name LIKE CONCAT('%', :bestMatcher, '%')
-		                                )
-		                      )
-		               )
-		        """,
-		    nativeQuery = true
-		)
-		Page<Store> searchNearbyStoresByDistance(
-		        @Param("lon")        double lon,
-		        @Param("lat")        double lat,
-		        @Param("bbox")       String bbox,          // ← WKT 문자열
-		        @Param("radius")     int    radiusMeters,
-		        @Param("original")   String original,
-		        @Param("bestMatcher")String bestMatcher,
-		        Pageable pageable
-		);
-	
-	
-	@Query(
-		    value = """
-		        SELECT  s.*,
-		                ST_Distance_Sphere(
-		                    s.store_location,
-		                    ST_SRID(Point(:lon, :lat), 4326)
-		                ) AS dist
-		        FROM    store s
-		        WHERE   MBRContains(
-		    			ST_GeomFromText('POLYGON((126.971639 37.508727, 127.039609 37.508727, 127.039609 37.562625, 126.971639 37.562625, 126.971639 37.508727))', 4326, 'axis-order=long-lat')
-		                 ,   s.store_location
-		                )
-		          AND   ST_Distance_Sphere(
-		                    s.store_location,
-		                    ST_SRID(Point(:lon, :lat), 4326)
-		                ) <= :radius
-		          AND  (
-		                    s.store_name LIKE CONCAT('%', :original, '%')
-		                    OR s.store_name LIKE CONCAT('%', :bestMatcher, '%')
-		                    OR EXISTS (
-		                           SELECT 1
-		                           FROM   menu m
-		                           WHERE  m.store_id = s.store_id
-		                             AND (
-		                                  m.menu_name LIKE CONCAT('%', :original, '%')
-		                                  OR m.menu_name LIKE CONCAT('%', :bestMatcher, '%')
-		                                 )
-		                       )
-		               )
-		          AND s.category = :category
-		        ORDER BY dist ASC
-		        """,
-		    countQuery = """
-		        SELECT COUNT(*)
-		        FROM   store s
-		        WHERE  MBRContains(
-		    				ST_GeomFromText('POLYGON((126.971639 37.508727, 127.039609 37.508727, 127.039609 37.562625, 126.971639 37.562625, 126.971639 37.508727))', 4326, 'axis-order=long-lat')
-		                   ,s.store_location
-		               )
-		          AND  ST_Distance_Sphere(
-		                   s.store_location,
-		                   ST_SRID(Point(:lon, :lat), 4326)
-		               ) <= :radius
-		          AND  (
-		                   s.store_name LIKE CONCAT('%', :original, '%')
-		                   OR s.store_name LIKE CONCAT('%', :bestMatcher, '%')
-		                   OR EXISTS (
-		                          SELECT 1
-		                          FROM   menu m
-		                          WHERE  m.store_id = s.store_id
-		                            AND (
-		                                 m.menu_name LIKE CONCAT('%', :original, '%')
-		                                 OR m.menu_name LIKE CONCAT('%', :bestMatcher, '%')
-		                                )
-		                      )
-		               )
-		        """,
-		    nativeQuery = true
-		)
-		Page<Store> searchNearbyStoresByDistanceWithCategory(
-		        @Param("lon")        double lon,
-		        @Param("lat")        double lat,
-		        @Param("bbox")       String bbox,          // ← WKT 문자열
-		        @Param("radius")     int    radiusMeters,
-		        @Param("original")   String original,
-		        @Param("bestMatcher")String bestMatcher,
-		        @Param("category") String category,
-		        Pageable pageable
-		);
+//	@Query(
+//		    value = """
+//		        SELECT  s.*,
+//		                ST_Distance_Sphere(
+//		                    s.store_location,
+//		                    ST_SRID(Point(:lon, :lat), 4326)
+//		                ) AS dist
+//		        FROM    store s
+//		        WHERE   MBRContains(
+//		    			ST_GeomFromText(:bbox, 4326, 'axis-order=long-lat')
+//		                 ,   s.store_location
+//		                )
+//		          AND   ST_Distance_Sphere(
+//		                    s.store_location,
+//		                    ST_SRID(Point(:lon, :lat), 4326)
+//		                ) <= :radius
+//		          AND  (
+//		                    s.store_name LIKE CONCAT('%', :original, '%')
+//		                    OR s.store_name LIKE CONCAT('%', :bestMatcher, '%')
+//		                    OR EXISTS (
+//		                           SELECT 1
+//		                           FROM   menu m
+//		                           WHERE  m.store_id = s.store_id
+//		                             AND (
+//		                                  m.menu_name LIKE CONCAT('%', :original, '%')
+//		                                  OR m.menu_name LIKE CONCAT('%', :bestMatcher, '%')
+//		                                 )
+//		                       )
+//		               )
+//		        ORDER BY dist ASC
+//		        """,
+//		    countQuery = """
+//		        SELECT COUNT(*)
+//		        FROM   store s
+//		        WHERE  MBRContains(
+//		    				ST_GeomFromText(:bbox, 4326, 'axis-order=long-lat')
+//		                   ,s.store_location
+//		               )
+//		          AND  ST_Distance_Sphere(
+//		                   s.store_location,
+//		                   ST_SRID(Point(:lon, :lat), 4326)
+//		               ) <= :radius
+//		          AND  (
+//		                   s.store_name LIKE CONCAT('%', :original, '%')
+//		                   OR s.store_name LIKE CONCAT('%', :bestMatcher, '%')
+//		                   OR EXISTS (
+//		                          SELECT 1
+//		                          FROM   menu m
+//		                          WHERE  m.store_id = s.store_id
+//		                            AND (
+//		                                 m.menu_name LIKE CONCAT('%', :original, '%')
+//		                                 OR m.menu_name LIKE CONCAT('%', :bestMatcher, '%')
+//		                                )
+//		                      )
+//		               )
+//		        """,
+//		    nativeQuery = true
+//		)
+//		Page<Store> searchNearbyStoresByDistance(
+//		        @Param("lon")        double lon,
+//		        @Param("lat")        double lat,
+//		        @Param("bbox")       String bbox,          // ← WKT 문자열
+//		        @Param("radius")     int    radiusMeters,
+//		        @Param("original")   String original,
+//		        @Param("bestMatcher")String bestMatcher,
+//		        Pageable pageable
+//		);
+//	
+//	
+//	@Query(
+//		    value = """
+//		        SELECT  s.*,
+//		                ST_Distance_Sphere(
+//		                    s.store_location,
+//		                    ST_SRID(Point(:lon, :lat), 4326)
+//		                ) AS dist
+//		        FROM    store s
+//		        WHERE   MBRContains(
+//		    			ST_GeomFromText(:bbox, 4326, 'axis-order=long-lat')
+//		                 ,   s.store_location
+//		                )
+//		          AND   ST_Distance_Sphere(
+//		                    s.store_location,
+//		                    ST_SRID(Point(:lon, :lat), 4326)
+//		                ) <= :radius
+//		          AND  (
+//		                    s.store_name LIKE CONCAT('%', :original, '%')
+//		                    OR s.store_name LIKE CONCAT('%', :bestMatcher, '%')
+//		                    OR EXISTS (
+//		                           SELECT 1
+//		                           FROM   menu m
+//		                           WHERE  m.store_id = s.store_id
+//		                             AND (
+//		                                  m.menu_name LIKE CONCAT('%', :original, '%')
+//		                                  OR m.menu_name LIKE CONCAT('%', :bestMatcher, '%')
+//		                                 )
+//		                       )
+//		               )
+//		          AND s.category = :category
+//		        ORDER BY dist ASC
+//		        """,
+//		    countQuery = """
+//		        SELECT COUNT(*)
+//		        FROM   store s
+//		        WHERE  MBRContains(
+//		    				ST_GeomFromText(:bbox, 4326, 'axis-order=long-lat')
+//		                   ,s.store_location
+//		               )
+//		          AND  ST_Distance_Sphere(
+//		                   s.store_location,
+//		                   ST_SRID(Point(:lon, :lat), 4326)
+//		               ) <= :radius
+//		          AND  (
+//		                   s.store_name LIKE CONCAT('%', :original, '%')
+//		                   OR s.store_name LIKE CONCAT('%', :bestMatcher, '%')
+//		                   OR EXISTS (
+//		                          SELECT 1
+//		                          FROM   menu m
+//		                          WHERE  m.store_id = s.store_id
+//		                            AND (
+//		                                 m.menu_name LIKE CONCAT('%', :original, '%')
+//		                                 OR m.menu_name LIKE CONCAT('%', :bestMatcher, '%')
+//		                                )
+//		                      )
+//		               )
+//		        """,
+//		    nativeQuery = true
+//		)
+//		Page<Store> searchNearbyStoresByDistanceWithCategory(
+//		        @Param("lon")        double lon,
+//		        @Param("lat")        double lat,
+//		        @Param("bbox")       String bbox,          // ← WKT 문자열
+//		        @Param("radius")     int    radiusMeters,
+//		        @Param("original")   String original,
+//		        @Param("bestMatcher")String bestMatcher,
+//		        @Param("category") String category,
+//		        Pageable pageable
+//		);
 	
 
 }

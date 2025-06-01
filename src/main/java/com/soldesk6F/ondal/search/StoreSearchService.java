@@ -20,6 +20,7 @@ import com.soldesk6F.ondal.login.CustomUserDetails;
 import com.soldesk6F.ondal.store.dto.StoreDistanceProjection;
 import com.soldesk6F.ondal.store.entity.StoreDto;
 import com.soldesk6F.ondal.store.repository.StoreRepository;
+import com.soldesk6F.ondal.store.repository.StoreRepositoryCustom;
 import com.soldesk6F.ondal.user.controller.user.UpdateUserController;
 import com.soldesk6F.ondal.user.entity.User;
 import com.soldesk6F.ondal.user.repository.UserRepository;
@@ -39,7 +40,7 @@ public class StoreSearchService {
     
     
     
-    public List<StoreDto> searchByRadiusWithCond(int radiusMeters , String original ,String bestMatcher, StoreSortType sortType, int page , int size,String category ) {
+    public List<StoreDto> searchByRadiusWithCond(int radiusMeters , String original ,List<String> bestMatchers, StoreSortType sortType, int page , int size,String category ) {
     	
     	
     	
@@ -95,7 +96,7 @@ public class StoreSearchService {
                     bbox,              // ← WKT 바운딩 박스
                     radiusMeters,      // 반경 (m)
                     original,
-                    bestMatcher,
+                    bestMatchers,
                     pageable)
                .stream()
                .map(store -> {
@@ -138,7 +139,7 @@ public class StoreSearchService {
                     bbox,              // ← WKT 바운딩 박스
                     radiusMeters,      // 반경 (m)
                     original,
-                    bestMatcher,
+                    bestMatchers,
                     category,
                     pageable
                     )

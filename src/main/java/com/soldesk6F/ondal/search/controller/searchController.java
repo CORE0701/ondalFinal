@@ -23,11 +23,11 @@ public class searchController {
 	private final StoreSearchService storeSearchService;
 	
 	@GetMapping("/storeInRadiusFromIndex")
-	public String searchStoreInRadius(@RequestParam("orignal") String orignalSearchQuery , @RequestParam("bestMatcher") String bestMatcher,@RequestParam("category") String category , Model model) {
+	public String searchStoreInRadius(@RequestParam("orignal") String orignalSearchQuery , @RequestParam("bestMatchers") List<String> bestMatchers,@RequestParam("category") String category , Model model) {
 		
 		model.addAttribute("selectedCategory",category);
 		model.addAttribute("original",orignalSearchQuery);
-		model.addAttribute("bestMatcher",bestMatcher);
+		model.addAttribute("bestMatchers",bestMatchers);
 		
 		return "content/store/storeList";
 	}

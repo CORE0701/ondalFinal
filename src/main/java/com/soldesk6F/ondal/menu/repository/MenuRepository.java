@@ -21,6 +21,9 @@ public interface MenuRepository extends JpaRepository<Menu, UUID> {
 	boolean existsByMenuCategory(MenuCategory menuCategory);
 	List<Menu> findByStore_StoreId(UUID storeId);
 	
+	@Query(value = "SELECT menu_name FROM menu", nativeQuery = true)
+	List<String> findAllMenuNames();
+	
 	
 }
 

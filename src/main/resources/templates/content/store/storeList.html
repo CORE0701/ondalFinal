@@ -66,7 +66,9 @@
 
 
 		  </div>
-		<div class="food-buttons" style="margin-top: 5rem;" >
+		  <div id="controls-bar"
+		       class="d-flex flex-wrap justify-content-center align-items-center gap-2" style="margin-top: 5rem;">
+		<div class="food-buttons"  >
 			<button class="food-btn" onclick="loadCategory('fastfood', this)">패스트푸드</button>
 		    <button class="food-btn" onclick="loadCategory('cn', this)">중식</button>
 		    <button class="food-btn" onclick="loadCategory('kr', this)">한식</button>
@@ -77,6 +79,17 @@
 		    <button class="food-btn" onclick="loadCategory('jp', this)">일식</button>
 		    <button class="food-btn" onclick="loadCategory('roast', this)">구이</button>
 		    <button class="food-btn" onclick="loadCategory('caffe', this)">카페</button>
+		</div>
+		
+		<div class="sort-wrapper">
+		  <select id="sort-select" class="form-select">
+		    <option value="distance">거리순</option>
+		    <option value="rating">평점순</option>
+		    <option value="review">리뷰순</option>
+		    <option value="name">가게명</option>
+		  </select>
+		</div>
+		
 		</div>
 		<div id="gallery-area">
 			<div class="gallery-container">
@@ -124,7 +137,7 @@
 		<script th:inline="javascript">
 			const selectedCategory = /*[[${selectedCategory}]]*/ null;
 			const original = /*[[${original}]]*/ null;
-			const bestMatcher = /*[[${bestMatcher}]]*/ null;
+			const bestMatchers = /*[[${bestMatchers}]]*/ null;
 		</script>
 		<script>
 			const categoryMap = {
@@ -148,6 +161,7 @@
 				fetch(`/api/stores/${category}`)
 					.then(res => res.json())
 					.then(data => {
+					
 						console.log("받아온 데이터", data);
 						const gallery = document.querySelector("#gallery-area");
 						gallery.innerHTML = `

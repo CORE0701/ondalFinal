@@ -82,12 +82,21 @@ document.addEventListener('DOMContentLoaded', function() {
 		
 		
 		sessionStorage.setItem("food" , query);
-		const firstItem = document.querySelector('#list-autocomplete li');
+
+				
 		saveHistory(query);
 		
 		const encodeQuery = encodeURIComponent(query);
-		const encodeBestMatcher = encodeURIComponent(firstItem.textContent);
-		location.href = "/search/storeInRadiusFromIndex?orignal=" + encodeQuery + "&bestMatcher="+encodeBestMatcher + "&category=all";		
+
+		const stored = sessionStorage.getItem('bestMatchers');
+		const bestMatchers = stored ? JSON.parse(stored) : [];
+
+		const encodeBestMatcher = bestMatchers
+		  .map(word => `bestMatchers=${encodeURIComponent(word)}`)
+		  .join('&');
+
+		const fullUrl = `/search/storeInRadiusFromIndex?orignal=${encodeQuery}&${encodeBestMatcher}&category=all`;
+		location.href = fullUrl;	
 	}
 		
 		clearList();		
@@ -155,8 +164,8 @@ document.addEventListener('DOMContentLoaded', function() {
 	searchInput.addEventListener('input', handleAutocomplete);
 
 	async function handleAutocomplete() {
-	  const q = searchInput.value.trim();
-	  if(!hadAddress()){
+	  const q = searchInput.value.trim(); 
+	  if(!hadAddress()&&!isLogin){
 		clearList();
 		showAddrHistory();
 		return;
@@ -172,6 +181,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
 	    if (!res.ok) throw new Error('Server error');
 	    const data = await res.json();           
+
+		sessionStorage.setItem('bestMatchers', JSON.stringify(data));
 
 	    /* 리스트 갱신 */
 	    clearList();

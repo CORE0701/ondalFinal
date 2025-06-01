@@ -21,13 +21,34 @@ public class StoreSearchApiController {
     @GetMapping("/search/api/storeInRadius")
     public List<StoreDto> searchStoreInRadius(
             @RequestParam("orignal") String originalSearchQuery,
-            @RequestParam("bestMatcher") String bestMatcher,
-            @RequestParam("category") String category
+            @RequestParam("bestMatchers") List<String> bestMatcher,
+            @RequestParam("category") String category,
+            @RequestParam("orderBy") String orderBy
     ) {
     	
-    		
+//    	List<StoreDto> listSt = storeSearchService.searchByRadiusWithCond(
+//				5000,
+//				originalSearchQuery,
+//				bestMatcher,
+//				StoreSortType.DISTANCE,
+//				0,
+//				20,
+//				category
+//				);
+//    	if(listSt==null) {
+//    	
+//		System.out.println("널입니다");
+//    	
+//    	}else {
+//    	
+//    		for(StoreDto sd : listSt) {
+//    			System.out.println("식당이름:" + sd.getStoreName());
+//    		}
+//    		
+//    		
+//    	}
     		return storeSearchService.searchByRadiusWithCond(
-    				3000,
+    				4000,
     				originalSearchQuery,
     				bestMatcher,
     				StoreSortType.DISTANCE,
@@ -35,7 +56,7 @@ public class StoreSearchApiController {
     				20,
     				category
     				);
-    		
+    			
     	}
     	
     	

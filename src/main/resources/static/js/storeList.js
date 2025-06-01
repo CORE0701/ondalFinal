@@ -3,10 +3,11 @@ document.addEventListener('DOMContentLoaded', function() {
 	const authInfo = document.getElementById('authInfo');
 	const modalEl = document.getElementById('addressModal');
 	const modal = new bootstrap.Modal(modalEl);
+	
 	function loadSearch(category) {							
 					const params = new URLSearchParams({
 					    orignal: original,
-					    bestMatcher: bestMatcher,
+					    bestMatchers: bestMatchers,
 						category : category
 					});
 					fetch(`/search/api/storeInRadius?${params.toString()}`)
@@ -75,7 +76,6 @@ document.addEventListener('DOMContentLoaded', function() {
 			loadSearch(selectedCategory);
 		}
 	}
-	
 	var flashDurationInSeconds = 5;
 	 var flashContainerId = 'flash-messages';
 
@@ -93,7 +93,6 @@ document.addEventListener('DOMContentLoaded', function() {
     var activeIndex = -1;
 
 	const isLogin = authInfo?.dataset.login === 'true';
-
 	
 	
 
@@ -153,13 +152,20 @@ document.addEventListener('DOMContentLoaded', function() {
 		
 		
 		sessionStorage.setItem("food" , query);
-		const firstItem = document.querySelector('#list-autocomplete li');
 		saveHistory(query);
 			
-		const encodeQuery = encodeURIComponent(query);
-		const encodeBestMatcher = encodeURIComponent(firstItem.textContent);
 		const encodeCategory = encodeURIComponent(redirCategory);
-		location.href = "/search/storeInRadiusFromIndex?orignal=" + encodeQuery + "&bestMatcher="+encodeBestMatcher + "&category="+encodeCategory ;			
+		const encodeQuery = encodeURIComponent(query);
+
+		const stored = sessionStorage.getItem('bestMatchers');
+		const bestMatchers = stored ? JSON.parse(stored) : [];
+
+		const encodeBestMatcher = bestMatchers
+		  .map(word => `bestMatchers=${encodeURIComponent(word)}`)
+		  .join('&');
+
+		const fullUrl = `/search/storeInRadiusFromIndex?orignal=${encodeQuery}&${encodeBestMatcher}&category=${encodeCategory}`;
+		location.href = fullUrl;	
 	}
 		
 		clearList();		
@@ -228,7 +234,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 	async function handleAutocomplete() {
 	  const q = searchInput.value.trim();
-	  if(!hadAddress()){
+	  if(!hadAddress()&&!isLogin){
 		clearList();
 		showAddrHistory();
 		return;
@@ -243,6 +249,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	    const res = await fetch(`/autocomplete?query=${encodeURIComponent(q)}`);
 	    if (!res.ok) throw new Error('Server error');
 	    const data = await res.json();            // [ "감자탕", "갈비탕", ... ]
+		sessionStorage.setItem('bestMatchers', JSON.stringify(data));
 
 	    /* 리스트 갱신 */
 	    clearList();
@@ -253,6 +260,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 		activeIndex=-1;
 		refreshActiveItem();
+		
 	  } catch (e) {
 	    console.error(e);
 	    clearList();
