@@ -25,11 +25,21 @@ public class WebConfig implements WebMvcConfigurer{
 	 @Override
 	    public void addCorsMappings(CorsRegistry registry) {
 	        // 모든 경로에 대해 CORS 허용
+	    	String os = System.getProperty("os.name").toLowerCase();
+	    	if (os.contains("win")) {
 	        registry.addMapping("/**")
 	                .allowedOrigins("http://localhost:8080", "https://localhost:8443") // 허용할 도메인
 	                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS") // 허용할 HTTP 메서드
 	                .allowedHeaders("Authorization", "Content-Type") // 허용할 헤더
 	                .allowCredentials(true); // 쿠키를 포함한 요청을 허용
+	        }else {
+		        registry.addMapping("/**")
+                .allowedOrigins("http://on-dal.o-r.kr", "https://on-dal.o-r.kr") // 허용할 도메인
+                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS") // 허용할 HTTP 메서드
+                .allowedHeaders("Authorization", "Content-Type") // 허용할 헤더
+                .allowCredentials(true); // 쿠키를 포함한 요청을 허용
+	        }
+	    	
 	    }
 	 
 	@Override

@@ -23,6 +23,8 @@ public class NativeLibLoader {
     @Value("${native.lib.msvcrresource}")
     private Resource msvcr100DLL;
 
+    @Value("${native.lib.trieresource}")
+    private Resource trieLibResource;
     
     @PostConstruct
     public void loadNativeLibrary() throws IOException {
