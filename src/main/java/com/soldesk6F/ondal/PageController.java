@@ -60,7 +60,7 @@ public class PageController {
 	// 자주 묻는 질문 이동
 	@GetMapping("/faqs")
 	public String goFAQs() {
-		return "content/faq";
+		return "content/FAQ";
 	}
 	
 	private final OrderService orderService;

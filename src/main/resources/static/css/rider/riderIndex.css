@@ -12,12 +12,12 @@
 
 @font-face {
 	font-family: "yisunshin";
-	src : url('yisunshinB.ttf'), format('truetype');
+	src: url('yisunshinB.ttf'), format('truetype');
 }
 
 @font-face {
 	font-family: "siwol";
-	src : url('siwol.ttf');
+	src: url('siwol.ttf');
 }
 
 body {
@@ -230,5 +230,11 @@ a:link {
 	.info-header {
 		flex-direction: column;
 		gap: 5px;
+	}
+	@media ( max-width : 768px) {
+		#map {
+			height: auto;
+			display: block;
+		}
 	}
 }
