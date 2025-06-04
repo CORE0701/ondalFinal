@@ -1,6 +1,8 @@
 package com.soldesk6F.ondal.user.controller.user;
 
 import com.soldesk6F.ondal.user.service.UserService;
+
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -28,7 +30,7 @@ public class RegUserController {
 			@RequestParam("nickname") String nickname, @RequestParam("email") String email,
 			@RequestParam("password") String password, @RequestParam("userPhone") String userPhone,
 			@RequestParam("profileImage") MultipartFile profileImage,
-			@RequestParam(value = "socialLoginProvider", required = false) String socialLoginProvider, Model model) {
+			@RequestParam(value = "socialLoginProvider", required = false) String socialLoginProvider, Model model,HttpSession session) {
 		if (userService.isUserIdDuplicate(userId)) {
 			model.addAttribute("error", "이미 등록된 id입니다.");
 			fillUserData(model, userId, userName, nickname, email, userPhone,
@@ -38,7 +40,6 @@ public class RegUserController {
 
 		if (userService.isEmailDuplicate(email)) {
 			model.addAttribute("error", "이미 등록된 이메일입니다.");
-			fillUserData(model, userId, userName, nickname, email, userPhone, 					socialLoginProvider);
 			return "content/register";
 		}
 
@@ -47,6 +48,13 @@ public class RegUserController {
 			fillUserData(model, userId, userName, nickname, email, userPhone,
 					socialLoginProvider);
 			return "content/register";
+		}
+		if(session.getAttribute("isVerified")==null || !(boolean)session.getAttribute("isVerified")) {
+			model.addAttribute("error","이메일 인증을 완료해야합니다");
+			fillUserData(model, userId, userName, nickname, email, userPhone,
+					socialLoginProvider);
+			return "content/register";
+			
 		}
 
 		boolean success = userService.registerUser(userId, userName, nickname, email, password, userPhone,null,

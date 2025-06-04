@@ -89,14 +89,18 @@ document.addEventListener('DOMContentLoaded', function() {
 		const encodeQuery = encodeURIComponent(query);
 
 		const stored = sessionStorage.getItem('bestMatchers');
+		if(stored==null){
+		location.href=`/search/storeInRadiusFromIndex?orignal=${encodeQuery}&category=all`;
+		}else{
 		const bestMatchers = stored ? JSON.parse(stored) : [];
 
 		const encodeBestMatcher = bestMatchers
 		  .map(word => `bestMatchers=${encodeURIComponent(word)}`)
 		  .join('&');
 
+		
 		const fullUrl = `/search/storeInRadiusFromIndex?orignal=${encodeQuery}&${encodeBestMatcher}&category=all`;
-		location.href = fullUrl;	
+		location.href = fullUrl;	}
 	}
 		
 		clearList();		

@@ -14,16 +14,16 @@ import java.nio.file.StandardCopyOption;
 @Component
 public class NativeLibLoader {
 
-    @Value("${native.lib.trieresource}")
+    @Value("${native.lib.win.trieresource}")
     private Resource trieDll;
 
-    @Value("${native.lib.pthreadresource}")
+    @Value("${native.lib.win.pthreadresource}")
     private Resource pthreadDll;
 
-    @Value("${native.lib.msvcrresource}")
+    @Value("${native.lib.win.msvcrresource}")
     private Resource msvcr100DLL;
 
-    @Value("${native.lib.trieresource}")
+    @Value("${native.lib.ubuntu.trieresource}")
     private Resource trieLibResource;
     
     @PostConstruct

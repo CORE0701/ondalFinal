@@ -137,6 +137,7 @@ function sendVerificationEmail() {
 	if (isSending) return;
 	isSending = true;
 	
+	
 	const fullEmail = getFullEmail();
 	let vaildCheck = fullEmail.split("@");
 	
@@ -145,15 +146,12 @@ function sendVerificationEmail() {
 		isSending = false;
 		return;
 	}
-	
 	const sendBtn = document.querySelector("#verificationGroup button");
 
 	startEmailCooldown(sendBtn);
-
 	fetch(`/email/send?email=${encodeURIComponent(fullEmail)}`)
 		.then(res => res.text())
 		.then(msg => {
-			alert(msg);
 			document.getElementById('verificationGroup').style.display = 'flex';
 		})
 		.catch(err => {

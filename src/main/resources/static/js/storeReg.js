@@ -40,9 +40,9 @@ document.addEventListener("DOMContentLoaded", function () {
 		const preview = document.getElementById("brandImgPreview");
 		const label = document.getElementById("file-name-display");
 
-		const maxSize = 1024 * 1024;
-		const maxWidth = 750;
-		const maxHeight = 750;
+		const maxSize = 1024 * 1024 * 5;
+		const maxWidth = 1200;
+		const maxHeight = 1200;
 		const allowedExtensions = ['jpg', 'jpeg', 'png', 'gif'];
 
 		if (!file) {
@@ -60,9 +60,9 @@ document.addEventListener("DOMContentLoaded", function () {
 		}
 
 		if (file.size > maxSize) {
-			alert('파일 크기가 1MB를 초과했습니다. 다시 선택해주세요.');
+			alert('파일 크기가 5MB를 초과했습니다. 다시 선택해주세요.');
 			e.target.value = '';
-			label.textContent = '1MB 이하로 해주세요';
+			label.textContent = '5MB 이하로 해주세요';
 			preview.style.display = "none";
 			return;
 		}
@@ -74,7 +74,7 @@ document.addEventListener("DOMContentLoaded", function () {
 			if (img.width > maxWidth || img.height > maxHeight) {
 				alert(`이미지 크기는 ${maxWidth}x${maxHeight}px 이하여야 합니다.`);
 				e.target.value = '';
-				label.textContent = '750x750 이하로 해주세요';
+				label.textContent = '1200x1200 이하로 해주세요';
 				preview.style.display = "none";
 			} else {
 				label.textContent = file.name;

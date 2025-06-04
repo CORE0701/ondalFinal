@@ -50,8 +50,10 @@ public class EmailController {
 		    if (code.equals(storedCode)) {
 		    	session.removeAttribute("emailVerificationCode");
 		        session.removeAttribute("emailCodeTime");
+		        session.setAttribute("isVerified", true);
 		        return "ok";
 			} else {
+		        session.setAttribute("isVerified", false);
 		        return "fail";
 			}
 		} catch (Exception e) {
