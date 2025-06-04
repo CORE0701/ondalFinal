@@ -66,8 +66,29 @@ public class NativeLibLoader {
     	
     	
     	} else {
-    	    System.load("src/main/resources/native/linux/trie.so");
-    	}
+    	     File tempDir = Files.createTempDirectory("native-lib-temp").toFile();
+
+    	        // 2. .so 파일명 지정
+    	        String nativeLibName = "trie.so";
+
+    	        // 3. 파일 객체 생성
+    	        File nativeLibFile = new File(tempDir, nativeLibName);
+
+    	        // 4. 리소스에서 .so 파일 복사
+    	        try (InputStream in = trieLibResource.getInputStream()) {
+    	            Files.copy(in, nativeLibFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+    	        }
+
+    	        // 5. 로드 전 디버깅 출력
+    	        System.out.println("[DEBUG] Native library temp dir: " + tempDir.getAbsolutePath());
+    	        for (File f : tempDir.listFiles()) {
+    	            System.out.println(" - 복사된 파일: " + f.getName());
+    	        }
+
+    	        // 6. 네이티브 라이브러리 로드
+    	        System.load(nativeLibFile.getAbsolutePath());
+
+    	        System.out.println("[DEBUG] Native library loaded successfully.");    	}
     	
             }
 
